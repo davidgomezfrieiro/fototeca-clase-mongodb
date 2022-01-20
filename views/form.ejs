@@ -12,6 +12,10 @@
 </head>
 
 <body>
+    <header>
+        <%- include('./partials/navigation'); %>
+    </header>
+
     <h1>Nueva Foto</h1>
     <form action="/nueva-foto" method="post">
         <label for="nombre">Título de la foto</label>
@@ -23,6 +27,17 @@
 
         <input type="submit" value="Añadir Foto">
     </form>
+
+    <!-- Si la foto que he intentado introducir ya existe; mostrar un <div> con un mensaje de error-->
+
+    <% if (error) { %>
+        <p style="color:red">
+            ERROR:
+            <%= error %>
+        </p>
+        <% } %>
+
+
 </body>
 
 </html>

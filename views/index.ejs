@@ -6,26 +6,38 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <link rel="stylesheet" href="main.css">
     <title>Fototeca</title>
 </head>
 
+
 <body>
-    <h1>Fototeca</h1>
+
+    <header>
+        <%- include('./partials/navigation'); %>
+    </header>
+
+    <h1 style="color: <%= colorTitulo %>">Fototeca</h1>
     <h2>
-        <p>19 de Enero de 2022</p>
+        <p>
+            20 de Enero de 2022
+        </p>
     </h2>
     <p>Hasta el momento se han subido <%= numFotos %> fotos</p>
 
     <ul>
         <% fotos.forEach(function(foto) { %>
             <li>
-                <strong>
-                    <%= foto.titulo %> - <%= foto.fecha %>
-                </strong>
-
+                <div>
+                    <img class="foto" src="<%= foto.url %>" alt="<%= foto.titulo %>">
+                    <strong>
+                        <%= foto.titulo %> - <%= foto.fecha %>
+                    </strong>
+                </div>
             </li>
             <% }); %>
     </ul>
+
 
     <script src="script.js"></script>
 </body>
