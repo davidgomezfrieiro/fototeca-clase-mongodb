@@ -5,7 +5,23 @@ const express = require('express');
 const app = express();
 
 // "Base de datos" de las fotos que me han subido al servidor
-let fotos = [];
+let fotos = [
+    {
+        titulo: 'Cosa',
+        url: 'https://i.picsum.photos/id/260/200/200.jpg?hmac=Nu9V4Ixqq3HiFhfkcsL5mNRZAZyEHG2jotmiiMRdxGA',
+        fecha: '2022-01-14'
+    },
+    {
+        titulo: 'Cosa-2',
+        url: 'https://i.picsum.photos/id/260/200/200.jpg?hmac=Nu9V4Ixqq3HiFhfkcsL5mNRZAZyEHG2jotmiiMRdxGA',
+        fecha: '2022-01-12'
+    },
+    {
+        titulo: 'Cosa-3',
+        url: 'https://i.picsum.photos/id/260/200/200.jpg?hmac=Nu9V4Ixqq3HiFhfkcsL5mNRZAZyEHG2jotmiiMRdxGA',
+        fecha: '2021-01-01'
+    }
+]
 
 // Configuro el color del H1 FOTOTECA
 let colorTitulo = "#346135";
@@ -25,7 +41,6 @@ app.set('view engine', 'ejs');
 app.get('/', function (req, res) {
     res.render("index", {
         numFotos: fotos.length,
-        saluda: "HOLA!",
         fotos, // si la propiedad del objeto y el valor de donde la obtienes se llaman igual; no hace falta fotos:fotos
         colorTitulo
     });
@@ -44,7 +59,6 @@ app.post('/nueva-foto', (req, res) => {
         url: req.body.url,
         fecha: req.body.fecha
     }
-    console.log(foto);
 
     let fotoExiste = existeFotoBBDD(req.body.url);
 
@@ -60,8 +74,15 @@ app.post('/nueva-foto', (req, res) => {
     // 2 Añadir el objeto al array fotos
     fotos.push(foto);
 
+    // Ordenamos el array de fotos 
+    ordenarFechaDecreciente(fotos);
+
     // 3. Redirigimos al usuario a la lista de imágenes
     res.redirect('/');
+
+    // 5. console
+    console.log("Base de datos:", fotos);
+
 });
 
 /**
@@ -104,6 +125,23 @@ function existeFotoBBDD(url) {
     let encontrado = fotos.some(foto => url == foto.url)
 
     return encontrado;
+}
+
+function ordenarFechaDecreciente(fotos) {
+    fotos.sort((foto1, foto2) => {
+        // Si la fecha de la foto1 es mayor que la fecha de la foto2 (es más actual); debería ir más al principio
+        // Más al principio significa que tenemos que devolver un número negativo (-1)
+
+        if (foto1.fecha > foto2.fecha) {
+            return -1;
+        }
+
+        if (foto1.fecha < foto2.fecha) {
+            return 1;
+        }
+
+        return 0;
+    });
 }
 
 app.listen(3000);
