@@ -39,8 +39,6 @@ app.get('/nueva-foto', (req, res) => {
 
 // endpoint recibir peticiones de tipo POST a '/nueva-foto'; y de momento, simplemente hacer un console.log del objeto req.body
 app.post('/nueva-foto', (req, res) => {
-    // 1 Crear un nuevo objeto que almacene los campos de la foto
-    console.log(req.body);
     let foto = {
         titulo: req.body.nombre,
         url: req.body.url,
@@ -48,13 +46,11 @@ app.post('/nueva-foto', (req, res) => {
     }
     console.log(foto);
 
-    // Antes de actualizar la base de datos, vamos a comprobar si la foto ya existe
-    // Una foto ya existe si hay un objeto en "fotos" que tenga la URL que pretendemos insertar
-
     let fotoExiste = existeFotoBBDD(req.body.url);
+
     if (fotoExiste) {
         // Devolver al usuario a la página del formularo indicándole que la URL ya existe
-        res.render("form", {
+        res.status(409).render("form", {
             error: `La URL ${req.body.url} ya existe.`
         })
 
@@ -64,8 +60,8 @@ app.post('/nueva-foto', (req, res) => {
     // 2 Añadir el objeto al array fotos
     fotos.push(foto);
 
-    // 3. REspondar el cliente con un mensaje simple diciendo el número de foto que hay subidas hasta el momento
-    res.status(201).send(`Foto subido correctamente!!`);
+    // 3. Redirigimos al usuario a la lista de imágenes
+    res.redirect('/');
 });
 
 /**
