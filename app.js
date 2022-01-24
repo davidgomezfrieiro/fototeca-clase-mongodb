@@ -42,13 +42,16 @@ app.get('/', function (req, res) {
     res.render("index", {
         numFotos: fotos.length,
         fotos, // si la propiedad del objeto y el valor de donde la obtienes se llaman igual; no hace falta fotos:fotos
-        colorTitulo
+        colorTitulo,
+        path: req.route.path
     });
 })
 
 app.get('/nueva-foto', (req, res) => {
+    console.log("Valor de la ruta: ", req.route);
     res.render("form", {
-        error: ""
+        error: "",
+        path: req.route.path
     });
 });
 
@@ -65,7 +68,8 @@ app.post('/nueva-foto', (req, res) => {
     if (fotoExiste) {
         // Devolver al usuario a la página del formularo indicándole que la URL ya existe
         res.status(409).render("form", {
-            error: `La URL ${req.body.url} ya existe.`
+            error: `La URL ${req.body.url} ya existe.`,
+            path: req.route.path
         })
 
         return; // debo salir de la función para no ejecutar más código
