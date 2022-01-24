@@ -1,27 +1,33 @@
 // Importamos la biblioteca de terceros 'express'
 const express = require('express');
 
+// import getColorFromURL function from color-thief-node
+const { getColorFromURL } = require('color-thief-node');
+
+
 // Crear una nueva instancia del objeto Express
 const app = express();
 
+let fotos = [];
+
 // "Base de datos" de las fotos que me han subido al servidor
-let fotos = [
-    {
-        titulo: 'Cosa',
-        url: 'https://i.picsum.photos/id/260/200/200.jpg?hmac=Nu9V4Ixqq3HiFhfkcsL5mNRZAZyEHG2jotmiiMRdxGA',
-        fecha: '2022-01-14'
-    },
-    {
-        titulo: 'Cosa-2',
-        url: 'https://i.picsum.photos/id/260/200/200.jpg?hmac=Nu9V4Ixqq3HiFhfkcsL5mNRZAZyEHG2jotmiiMRdxGA',
-        fecha: '2022-01-12'
-    },
-    {
-        titulo: 'Cosa-3',
-        url: 'https://i.picsum.photos/id/260/200/200.jpg?hmac=Nu9V4Ixqq3HiFhfkcsL5mNRZAZyEHG2jotmiiMRdxGA',
-        fecha: '2021-01-01'
-    }
-]
+// let fotos = [
+//     {
+//         titulo: 'Cosa',
+//         url: 'https://i.picsum.photos/id/260/200/200.jpg?hmac=Nu9V4Ixqq3HiFhfkcsL5mNRZAZyEHG2jotmiiMRdxGA',
+//         fecha: '2022-01-14'
+//     },
+//     {
+//         titulo: 'Cosa-2',
+//         url: 'https://i.picsum.photos/id/260/200/200.jpg?hmac=Nu9V4Ixqq3HiFhfkcsL5mNRZAZyEHG2jotmiiMRdxGA',
+//         fecha: '2022-01-12'
+//     },
+//     {
+//         titulo: 'Cosa-3',
+//         url: 'https://i.picsum.photos/id/260/200/200.jpg?hmac=Nu9V4Ixqq3HiFhfkcsL5mNRZAZyEHG2jotmiiMRdxGA',
+//         fecha: '2021-01-01'
+//     }
+// ]
 
 // Configuro el color del H1 FOTOTECA
 let colorTitulo = "#346135";
@@ -56,12 +62,7 @@ app.get('/nueva-foto', (req, res) => {
 });
 
 // endpoint recibir peticiones de tipo POST a '/nueva-foto'; y de momento, simplemente hacer un console.log del objeto req.body
-app.post('/nueva-foto', (req, res) => {
-    let foto = {
-        titulo: req.body.nombre,
-        url: req.body.url,
-        fecha: req.body.fecha
-    }
+app.post('/nueva-foto', async (req, res) => {
 
     let fotoExiste = existeFotoBBDD(req.body.url);
 
@@ -73,6 +74,15 @@ app.post('/nueva-foto', (req, res) => {
         })
 
         return; // debo salir de la función para no ejecutar más código
+    }
+
+    let color = await obtenerColorPredominante(req.body.url);
+
+    let foto = {
+        titulo: req.body.nombre,
+        url: req.body.url,
+        fecha: req.body.fecha,
+        color
     }
 
     // 2 Añadir el objeto al array fotos
@@ -89,6 +99,9 @@ app.post('/nueva-foto', (req, res) => {
 
 });
 
+async function obtenerColorPredominante(url) {
+    return await getColorFromURL(url);
+}
 /**
  * Función que determina si existe una foto en la base de datos 'fotos'
  * 
