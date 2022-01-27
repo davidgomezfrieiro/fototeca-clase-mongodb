@@ -5,7 +5,8 @@ const Imagen = require('../models/imagen');
 
 exports.getAllImages = function (req, res) {
 
-    let fotos = obtenerImagenes();
+    //let fotos = obtenerImagenes();
+    let fotos = [];
 
     res.render("index", {
         numFotos: fotos.length,
