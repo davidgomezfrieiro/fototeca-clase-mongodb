@@ -1,6 +1,12 @@
 // Importamos la biblioteca de terceros 'express'
 const express = require('express');
 
+// Importamos el módulo de mongoose
+const mongoose = require('mongoose');
+
+// Uri
+const uri = "mongodb+srv://root:root@cluster0.uxg9l.mongodb.net/fototeca";
+
 // Importar todas las rutas
 const imagesRoutes = require('./routes/imagen');
 
@@ -19,4 +25,15 @@ app.set('view engine', 'ejs');
 // Registro todas las rutas en el app
 app.use(imagesRoutes);
 
-app.listen(3000);
+// Nos concetaremos a la BBDD de Atlas y luego levantaremos la app en el puerto 3000
+
+mongoose.connect(uri, (err) => {
+
+    if (err) {
+        console.log(`Ha ocurrido el siguiente error al conectarnos a la base de datos ${err}`);
+        return;
+    };
+
+    app.listen(3000);
+
+});

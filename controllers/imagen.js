@@ -1,7 +1,7 @@
 // import getColorFromURL function from color-thief-node
 const { getColorFromURL } = require('color-thief-node');
 
-const { añadirNuevaImagen, existeImagenBBDD, obtenerImagenes } = require('../models/imagen');
+const Imagen = require('../models/imagen');
 
 exports.getAllImages = function (req, res) {
 
@@ -35,24 +35,48 @@ exports.postNewImage = async (req, res) => {
 
     let { nombre: titulo, url, fecha } = req.body;
 
-    let fotoExiste = existeImagenBBDD(url);
-
-    if (fotoExiste) {
-        // Devolver al usuario a la página del formularo indicándole que la URL ya existe
-        res.status(409).render("form", {
-            error: `La URL ${req.body.url} ya existe.`,
-            path: req.route.path
-        })
-
-        return; // debo salir de la función para no ejecutar más código
+    if (titulo.length > 10) {
+        console.log(error); // enviar un correo a develop@altia.com con lo que ha pasado
+        res.send("Algo ha ido mal al insertar la foto...prueba más tarde.");
+        return;
     }
+
+    // let fotoExiste = existeImagenBBDD(url);
+
+    // if (fotoExiste) {
+    //     // Devolver al usuario a la página del formularo indicándole que la URL ya existe
+    //     res.status(409).render("form", {
+    //         error: `La URL ${req.body.url} ya existe.`,
+    //         path: req.route.path
+    //     })
+
+    //     return; // debo salir de la función para no ejecutar más código
+    // }
 
     let color = await obtenerColorPredominante(req.body.url);
 
-    añadirNuevaImagen(titulo, url, fecha, color);
+    //añadirNuevaImagen(titulo, url, fecha, color);
+    const imagen = new Imagen({
+        titulo,
+        url,
+        fecha,
+        color
+    });
+
+    let resultado;
+    try {
+        resultado = await imagen.save();
+    }
+    catch (error) {
+        console.log(error); // enviar un correo a develop@altia.com con lo que ha pasado
+        res.send("Algo ha ido mal al insertar la foto...prueba más tarde.");
+        return;
+    }
+    // TONOTTODO: No hay por que informar al cliente del ID de la foto que hemos creado en base datos 
+    res.send(`He insertado la foto en base de datos y su ID es ${resultado._id}`);
 
     // 3. Redirigimos al usuario a la lista de imágenes
-    res.redirect('/');
+    //res.redirect('/');
 };
 
 async function obtenerColorPredominante(url) {
