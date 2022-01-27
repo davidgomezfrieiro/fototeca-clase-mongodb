@@ -1,12 +1,15 @@
 // import getColorFromURL function from color-thief-node
 const { getColorFromURL } = require('color-thief-node');
+const Mongoose = require('mongoose');
 
 const Imagen = require('../models/imagen');
 
-exports.getAllImages = function (req, res) {
+const uri = "mongodb+srv://root:root@cluster0.pycqe.mongodb.net/fototeca"
 
-    //let fotos = obtenerImagenes();
-    let fotos = [];
+exports.getAllImages = async function (req, res) {
+
+    let fotos = await recuperarFotos()
+    console.log(fotos);
 
     res.render("index", {
         numFotos: fotos.length,
@@ -41,21 +44,9 @@ exports.postNewImage = async (req, res) => {
         res.send("Algo ha ido mal al insertar la foto...prueba más tarde.");
         return;
     }
-
-    // let fotoExiste = existeImagenBBDD(url);
-
-    // if (fotoExiste) {
-    //     // Devolver al usuario a la página del formularo indicándole que la URL ya existe
-    //     res.status(409).render("form", {
-    //         error: `La URL ${req.body.url} ya existe.`,
-    //         path: req.route.path
-    //     })
-
-    //     return; // debo salir de la función para no ejecutar más código
-    // }
-
+    
     let color = await obtenerColorPredominante(req.body.url);
-
+    
     //añadirNuevaImagen(titulo, url, fecha, color);
     const imagen = new Imagen({
         titulo,
@@ -63,7 +54,22 @@ exports.postNewImage = async (req, res) => {
         fecha,
         color
     });
-
+    
+    // -----------------------------------------------------------------------
+    
+    let fotoExiste = existeImagenBBDD(imagen.url);
+    
+    if (fotoExiste) {
+        // Devolver al usuario a la página del formularo indicándole que la URL ya existe
+        res.status(409).render("form", {
+            error: `La URL ${req.body.url} ya existe.`,
+            path: req.route.path
+        })
+    
+        return; // debo salir de la función para no ejecutar más código
+    }
+    
+    // ------------------------------------------------------------------------
     let resultado;
     try {
         resultado = await imagen.save();
@@ -74,11 +80,30 @@ exports.postNewImage = async (req, res) => {
         return;
     }
     // TONOTTODO: No hay por que informar al cliente del ID de la foto que hemos creado en base datos 
-    res.send(`He insertado la foto en base de datos y su ID es ${resultado._id}`);
-
+    //res.send(`He insertado la foto en base de datos y su ID es ${resultado._id}`);
+    
     // 3. Redirigimos al usuario a la lista de imágenes
-    //res.redirect('/');
+    res.redirect('/');
 };
+
+async function recuperarFotos() {
+    await Mongoose.connect(uri,{ useNewUrlParser: true, useUnifiedTopology: true })
+
+    const images = await Imagen.find()
+    //console.log(images);
+    
+    return images;
+}
+
+async function existeImagenBBDD(url) {
+    // comprobar si la url nueva está en la base de datos
+    const urlNuevaImagen = await Imagen.find({"url": url})
+
+    // Si no está, retornamos false, si sí existe retornamos true
+    if (!urlNuevaImagen) {
+        return false
+    }else{return true}
+}
 
 async function obtenerColorPredominante(url) {
     return await getColorFromURL(url);

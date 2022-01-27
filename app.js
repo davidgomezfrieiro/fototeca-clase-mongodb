@@ -5,7 +5,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 // Uri
-const uri = "mongodb+srv://root:root@cluster0.uxg9l.mongodb.net/fototeca";
+const uri = "mongodb+srv://root:root@cluster0.pycqe.mongodb.net/fototeca";
 
 // Importar todas las rutas
 const imagesRoutes = require('./routes/imagen');

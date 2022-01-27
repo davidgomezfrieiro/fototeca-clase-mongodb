@@ -25,16 +25,29 @@
     </h2>
     <p>Hasta el momento se han subido <%= numFotos %> fotos</p>
 
+    <form action="/">
+        <label for="busquedaTitulo">Nombre:</label>
+        <input id="busquedaTitulo" name="busquedaTitulo" type="text">
+        <button>Buscar</button>
+    </form>
+    <form action="/">
+        <select name="ordenar" id="ordenar">
+            <option value="creciente">Ordenar por antiguedad</option>
+            <option value="decreciente" selected>Ordenar por novedad</option>
+        </select>
+        <button>Ordenar</button>
+    </form>
+
     <ul>
-        <% fotos.forEach(function(foto) { %>
+        <% fotos.forEach(function(Imagen) { %>
             <li>
                 <div>
-                    <img class="foto" src="<%= foto.url %>" alt="<%= foto.titulo %>">
+                    <img class="foto" src="<%= Imagen.url %>" alt="<%= Imagen.titulo %>">
                     <strong>
-                        <%= foto.titulo %> - <%= foto.fecha %>
+                        <%= Imagen.titulo %> - <%= Imagen.fecha %>
                     </strong>
-                    <span style="background-color: rgb(<%= foto.color %>)">
-                        <%= foto.color %>
+                    <span style="background-color: rgb(<%= Imagen.color %>)">
+                        rgb(<%= Imagen.color %>)
                     </span>
                 </div>
             </li>
